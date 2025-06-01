@@ -1,4 +1,4 @@
-package org.example;
+package org.example.Backend;
 
 public class User {
 
@@ -133,4 +133,6 @@ public class User {
     public void setBk(BankAccount bk) {
         this.bk = bk;
     }
+
+
 }
