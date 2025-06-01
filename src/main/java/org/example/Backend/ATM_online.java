@@ -1,18 +1,19 @@
-package org.example;
+package org.example.Backend;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.example.UI.ATM_loginPanel;
 
 import java.io.*;
-import java.time.LocalDate;
-import java.util.Scanner;
+import java.lang.reflect.Type;
+import java.util.List;
 
 public class ATM_online {
-    private String username;
-    private String password;
-    private boolean isLoggedIn;
+    private static String username;
+    private static String password;
+    private static boolean isLoggedIn;
 
-    public ATM_online() {}
+    public ATM_online() {
+    }
 
     public ATM_online(String username, String password, boolean isLoggedIn) {
         this.username = username;
@@ -20,61 +21,49 @@ public class ATM_online {
         this.isLoggedIn = isLoggedIn;
     }
 
-    public void start(){
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to ATM Online!\n\n Do you want to login?");
-        String login = scanner.nextLine();
-        if (login.equalsIgnoreCase("yes")) {
-            login();
-        } else {
-            System.exit(10023);
+
+    public static BankAccount login(ATM_loginPanel loginPanel) {
+        String inputUsername = loginPanel.getUsername();
+        String inputPassword = loginPanel.getPassword();
+
+
+        Gson gson = GsonFactory.createGson();
+        File jsonFile = new File("atm_online_useri.json");
+
+        if (!jsonFile.exists()) {
+            loginPanel.setErrorLabel("Baza de date lipsește.");
+            return null;
         }
 
-
-    }
-
-    public boolean login() {
-        System.out.println("Insert your username:\n");
-        Scanner scanner = new Scanner(System.in);
-        username = scanner.nextLine();
-        System.out.println("Insert your password:\n");
-        password = scanner.nextLine();
-
-        String userN = null;
-        String userPass = null;
-
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("atm_online_useri.json"));
-            String line = reader.readLine();
-
-            while (line != null) {
-                String[] tokens = line.split(" ");
-                userN = tokens[6];
-                userPass = tokens[7];
+        List<BankAccount> accounts;
+        try (BufferedReader reader = new BufferedReader(new FileReader(jsonFile))) {
+            // 1) Citim un array de conturi, nu un singur obiect
+            Type listType = new com.google.gson.reflect.TypeToken<List<BankAccount>>() {}.getType();
+            accounts = gson.fromJson(reader, listType);
+            if (accounts == null) {
+                loginPanel.setErrorLabel("Nu există niciun cont.");
+                return null;
             }
+        } catch (Exception ex) {
+            loginPanel.setErrorLabel("Eroare la citirea bazei de date.");
+            return null;
+        }
 
-            if (username.equals(userN) && password.equals(userPass)) {
-                isLoggedIn = true;
-                return true;
+        // 2) Căutăm contul cu username+password în fiecare obiect BankAccount
+        for (BankAccount account : accounts) {
+            User u = account.getUser();
+            if (u != null) {
+                if (u.getUsername().equals(inputUsername) && u.getPassword().equals(inputPassword)) {
+                    System.out.println("Debug: login reușit");
+                    return account;
+                }
             }
-
-
-        } catch (IOException ex1) {
-            System.out.println("Something went wrong");
         }
 
-        isLoggedIn = false;
-        return false;
-
+        loginPanel.setErrorLabel("Username or password are incorrect.");
+        return null;
     }
 
-
-    public boolean logout() {
-        if (isLoggedIn) {
-            isLoggedIn = false;
-        }
-        return true;
-    }
 
 
     public boolean createAccount(BankAccount account) {
@@ -87,7 +76,6 @@ public class ATM_online {
             return false;
         }
     }
-
 
 
 }

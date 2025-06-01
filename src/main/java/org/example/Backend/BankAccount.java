@@ -1,4 +1,4 @@
-package org.example;
+package org.example.Backend;
 
 import java.time.LocalDate;
 
@@ -80,5 +80,9 @@ public class BankAccount {
     @Override
     public String toString() {
         return "Number: " + number + "\nUser: " + user + "\nBalance: " + balance + "\nExpire Date: " + expireDate;
+    }
+
+    public User getOwner() {
+        return user;
     }
 }
