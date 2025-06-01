@@ -13,19 +13,20 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class ATM_createAccount extends JPanel {
 
-    private JTextField CNP = new JTextField();
-    private JTextField firstName = new JTextField();
-    private JTextField lastName = new JTextField();
-    private JTextField email = new JTextField();
-    private JTextField phone = new JTextField();
-    private JTextField address = new JTextField();
-    private JTextField username = new JTextField();
-    private JPasswordField password = new JPasswordField();
-    private JLabel errorLabel = new JLabel();
+    private JTextField CNP = new JTextField(15);
+    private JTextField firstName = new JTextField(15);
+    private JTextField lastName = new JTextField(15);
+    private JTextField email = new JTextField(15);
+    private JTextField phone = new JTextField(15);
+    private JTextField address = new JTextField(15);
+    private JTextField username = new JTextField(15);
+    private JPasswordField password = new JPasswordField(15);
+    private JLabel errorLabel = new JLabel(" ");
 
     private JButton createAccount = new JButton("Create Account");
     private JButton loginButton = new JButton("Login");
@@ -37,90 +38,113 @@ public class ATM_createAccount extends JPanel {
         initComponents();
     }
 
-
     public void initComponents() {
-        this.setLayout(null);
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        Insets labelInsets = new Insets(8, 8, 2, 4);
+        Insets fieldInsets = new Insets(8, 2, 2, 8);
+        Insets buttonInsets = new Insets(16, 8, 8, 8);
 
-        // First Name
-        JLabel fNameLabel = new JLabel("First Name:");
-        fNameLabel.setBounds(10, 10, 100, 20);
-        this.add(fNameLabel);
-        firstName.setBounds(120, 10, 150, 20);
-        this.add(firstName);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
 
-        // Last Name
-        JLabel lNameLabel = new JLabel("Last Name:");
-        lNameLabel.setBounds(10, 40, 100, 20);
-        this.add(lNameLabel);
-        lastName.setBounds(120, 40, 150, 20);
-        this.add(lastName);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = labelInsets;
+        add(new JLabel("First Name:"), gbc);
 
-        // CNP
-        JLabel cnpLabel = new JLabel("CNP:");
-        cnpLabel.setBounds(10, 70, 100, 20);
-        this.add(cnpLabel);
-        CNP.setBounds(120, 70, 150, 20);
-        this.add(CNP);
+        gbc.gridx = 1;
+        gbc.insets = fieldInsets;
+        add(firstName, gbc);
 
-        // Email
-        JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setBounds(10, 100, 100, 20);
-        this.add(emailLabel);
-        email.setBounds(120, 100, 150, 20);
-        this.add(email);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.insets = labelInsets;
+        add(new JLabel("Last Name:"), gbc);
 
-        // Phone
-        JLabel phoneLabel = new JLabel("Phone:");
-        phoneLabel.setBounds(10, 130, 100, 20);
-        this.add(phoneLabel);
-        phone.setBounds(120, 130, 150, 20);
-        this.add(phone);
+        gbc.gridx = 1;
+        gbc.insets = fieldInsets;
+        add(lastName, gbc);
 
-        // Address
-        JLabel addressLabel = new JLabel("Address:");
-        addressLabel.setBounds(10, 160, 100, 20);
-        this.add(addressLabel);
-        address.setBounds(120, 160, 150, 20);
-        this.add(address);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.insets = labelInsets;
+        add(new JLabel("CNP:"), gbc);
 
-        // Username
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setBounds(10, 190, 100, 20);
-        this.add(usernameLabel);
-        username.setBounds(120, 190, 150, 20);
-        this.add(username);
+        gbc.gridx = 1;
+        gbc.insets = fieldInsets;
+        add(CNP, gbc);
 
-        // Password
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setBounds(10, 220, 100, 20);
-        this.add(passwordLabel);
-        password.setBounds(120, 220, 150, 20);
-        this.add(password);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.insets = labelInsets;
+        add(new JLabel("Email:"), gbc);
 
+        gbc.gridx = 1;
+        gbc.insets = fieldInsets;
+        add(email, gbc);
 
-        //button create account
-        createAccount.setBounds(120, 250, 120, 30);
-        this.add(createAccount);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.insets = labelInsets;
+        add(new JLabel("Phone:"), gbc);
 
-        //button create account
-        loginButton.setBounds(120, 290, 80, 30);
-        this.add(loginButton);
+        gbc.gridx = 1;
+        gbc.insets = fieldInsets;
+        add(phone, gbc);
 
-        loginButton.addActionListener(e -> {
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.insets = labelInsets;
+        add(new JLabel("Address:"), gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = fieldInsets;
+        add(address, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.insets = labelInsets;
+        add(new JLabel("Username:"), gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = fieldInsets;
+        add(username, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.insets = labelInsets;
+        add(new JLabel("Password:"), gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = fieldInsets;
+        add(password, gbc);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        buttonPanel.add(createAccount);
+        buttonPanel.add(loginButton);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.insets = buttonInsets;
+        add(buttonPanel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(4, 8, 8, 8);
+        errorLabel.setForeground(Color.RED);
+        add(errorLabel, gbc);
+
+        loginButton.addActionListener((ActionEvent e) -> {
             ATM_loginPanel ATM_loginPanel = new ATM_loginPanel(parentFrame);
             parentFrame.setContentPane(ATM_loginPanel);
             parentFrame.revalidate();
             parentFrame.repaint();
         });
 
-
-        //error label
-        errorLabel.setBounds(10, 290, 100, 40);
-        this.add(errorLabel);
-
-
-        createAccount.addActionListener(e -> {
-
+        createAccount.addActionListener((ActionEvent e) -> {
             String cnp       = CNP.getText().trim();
             String fName     = firstName.getText().trim();
             String lName     = lastName.getText().trim();
@@ -153,11 +177,10 @@ public class ATM_createAccount extends JPanel {
 
             JOptionPane.showMessageDialog(
                     ATM_createAccount.this,
-                    "Cont creat cu succes! Număr cont: " + generatedNumber,
+                    "Account created successfully. Acc. no.: " + generatedNumber,
                     "OK",
                     JOptionPane.INFORMATION_MESSAGE
             );
-
 
             CNP.setText("");
             firstName.setText("");
@@ -167,21 +190,12 @@ public class ATM_createAccount extends JPanel {
             address.setText("");
             username.setText("");
             password.setText("");
-
-
-
         });
-
-
-
-
     }
-
 
     private void saveAccountAsJson(BankAccount newAccount) {
         try {
             Gson gson = GsonFactory.createGson();
-
             String filePath = "atm_online_useri.json";
             List<BankAccount> list;
 
@@ -207,13 +221,10 @@ public class ATM_createAccount extends JPanel {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
                     ATM_createAccount.this,
-                    "Eroare la salvarea contului:\n" + ex.getMessage(),
-                    "Eroare I/O",
+                    "Error at saving account:\n" + ex.getMessage(),
+                    "Error I/O",
                     JOptionPane.ERROR_MESSAGE
             );
         }
     }
-
-
-
 }

@@ -19,7 +19,6 @@ public class ATM_loggedPage extends JPanel {
 
         setLayout(null);
 
-        // PANEL HOME (dreptunghi în care afișăm username, număr cont și sumă)
         JPanel panelHomePage = new JPanel();
         panelHomePage.setLayout(null);
         panelHomePage.setBounds(10, 10, 360, 120);

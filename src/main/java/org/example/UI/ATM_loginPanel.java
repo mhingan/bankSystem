@@ -7,10 +7,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ATM_loginPanel extends JPanel {
-    private JTextField usernameField  = new JTextField();
-    private JPasswordField passwordField = new JPasswordField();
+    private JTextField usernameField  = new JTextField(15);
+    private JPasswordField passwordField = new JPasswordField(15);
     private JButton loginButton      = new JButton("Login");
-    private JButton signupButton    = new JButton("Register");
+    private JButton signupButton     = new JButton("Register");
     private JLabel errorLabel        = new JLabel("", SwingConstants.CENTER);
     private JFrame parentFrame;
 
@@ -20,31 +20,45 @@ public class ATM_loginPanel extends JPanel {
     }
 
     private void initComponents() {
-        setLayout(null);
+        setLayout(new BorderLayout());
 
-        JLabel userLabel = new JLabel("Username:");
-        userLabel.setBounds(50, 50, 80, 25);
-        add(userLabel);
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        add(centerPanel, BorderLayout.CENTER);
 
-        usernameField.setBounds(130, 50, 160, 25);
-        add(usernameField);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        JLabel passLabel = new JLabel("Password:");
-        passLabel.setBounds(50, 90, 80, 25);
-        add(passLabel);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        centerPanel.add(new JLabel("Username:"), gbc);
 
-        passwordField.setBounds(130, 90, 160, 25);
-        add(passwordField);
+        gbc.gridx = 1;
+        centerPanel.add(usernameField, gbc);
 
-        loginButton.setBounds(130, 130, 80, 25);
-        add(loginButton);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        centerPanel.add(new JLabel("Password:"), gbc);
 
-        signupButton.setBounds(130, 160, 80, 25);
-        add(signupButton);
+        gbc.gridx = 1;
+        centerPanel.add(passwordField, gbc);
 
-        errorLabel.setBounds(50, 190, 240, 25);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
         errorLabel.setForeground(Color.RED);
-        add(errorLabel);
+        centerPanel.add(errorLabel, gbc);
+        gbc.gridwidth = 1;
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonPanel.add(loginButton);
+        buttonPanel.add(signupButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        centerPanel.add(buttonPanel, gbc);
 
         loginButton.addActionListener(e -> {
             BankAccount account = ATM_online.login(this);
@@ -56,12 +70,11 @@ public class ATM_loginPanel extends JPanel {
             }
         });
 
-
         signupButton.addActionListener(e -> {
-           ATM_createAccount createAccount = new ATM_createAccount(parentFrame);
-           parentFrame.setContentPane(createAccount);
-           parentFrame.revalidate();
-           parentFrame.repaint();
+            ATM_createAccount createAccount = new ATM_createAccount(parentFrame);
+            parentFrame.setContentPane(createAccount);
+            parentFrame.revalidate();
+            parentFrame.repaint();
         });
     }
 
