@@ -66,33 +66,98 @@ public class ATM_loggedPage extends JPanel {
 
         userInfoButton.addActionListener(e -> {
             JDialog dialog = new JDialog(parentFrame, "Personal info", Dialog.ModalityType.APPLICATION_MODAL);
-            dialog.setSize(300, 200);
+            dialog.setSize(350, 260);
             dialog.setLayout(null);
 
-            JLabel firstNameLabel = new JLabel("First name: " + u.getfName());
-            firstNameLabel.setBounds(10, 10, 280, 20);
-            dialog.add(firstNameLabel);
+            // First name
+            JTextField firstNameField = new JTextField(u.getfName());
+            firstNameField.setBounds(10, 10, 200, 20);
+            firstNameField.setEditable(false);
+            dialog.add(firstNameField);
 
-            JLabel lastNameLabel = new JLabel("Last name: " + u.getlName());
-            lastNameLabel.setBounds(10, 40, 280, 20);
-            dialog.add(lastNameLabel);
+            // Last name
+            JTextField lastNameField = new JTextField(u.getlName());
+            lastNameField.setBounds(10, 40, 200, 20);
+            lastNameField.setEditable(false);
+            dialog.add(lastNameField);
 
-            JLabel emailLabel = new JLabel("Email: " + u.getEmail());
-            emailLabel.setBounds(10, 70, 280, 20);
-            dialog.add(emailLabel);
+            // Email
+            JTextField emailField = new JTextField(u.getEmail());
+            emailField.setBounds(10, 70, 200, 20);
+            emailField.setEditable(false);
+            dialog.add(emailField);
 
-            JLabel phoneLabel = new JLabel("Phone: " + u.getPhone());
-            phoneLabel.setBounds(10, 100, 280, 20);
-            dialog.add(phoneLabel);
+            // Phone
+            JTextField phoneField = new JTextField(u.getPhone());
+            phoneField.setBounds(10, 100, 200, 20);
+            phoneField.setEditable(false);
+            dialog.add(phoneField);
 
-            JLabel addressLabel = new JLabel("Address: " + u.getAddress());
-            addressLabel.setBounds(10, 130, 280, 20);
-            dialog.add(addressLabel);
+            // Address
+            JTextField addressField = new JTextField(u.getAddress());
+            addressField.setBounds(10, 130, 200, 20);
+            addressField.setEditable(false);
+            dialog.add(addressField);
+
+            // Error/Success label
+            JLabel errorLabel = new JLabel("");
+            errorLabel.setBounds(10, 190, 320, 20);
+            dialog.add(errorLabel);
+
+            // Single Edit button
+            JButton editButton = new JButton("Edit");
+            editButton.setBounds(10, 160, 80, 20);
+            editButton.addActionListener(ev -> {
+                firstNameField.setEditable(true);
+                lastNameField.setEditable(true);
+                emailField.setEditable(true);
+                phoneField.setEditable(true);
+                addressField.setEditable(true);
+                errorLabel.setText("");
+            });
+            dialog.add(editButton);
+
+            // Save button
+            JButton saveButton = new JButton("Save");
+            saveButton.setBounds(120, 160, 80, 20);
+            dialog.add(saveButton);
+
+            saveButton.addActionListener(ev -> {
+                // Validation: all fields must be non-empty
+                if (firstNameField.getText().trim().isEmpty()
+                        || lastNameField.getText().trim().isEmpty()
+                        || emailField.getText().trim().isEmpty()
+                        || phoneField.getText().trim().isEmpty()
+                        || addressField.getText().trim().isEmpty()) {
+                    errorLabel.setText("Please fill in all fields.");
+                    errorLabel.setForeground(Color.RED);
+                    return;
+                }
+
+                // If validation passes, save and show success
+                u.setfName(firstNameField.getText());
+                u.setlName(lastNameField.getText());
+                u.setEmail(emailField.getText());
+                u.setPhone(phoneField.getText());
+                u.setAddress(addressField.getText());
+
+                errorLabel.setText("Saved successfully.");
+                errorLabel.setForeground(Color.GREEN);
+
+                // Delay closing so user sees the green message
+                new javax.swing.Timer(800, evt -> {
+                    ((javax.swing.Timer) evt.getSource()).stop();
+                    dialog.dispose();
+                }).start();
+            });
 
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setLocationRelativeTo(parentFrame);
             dialog.setVisible(true);
         });
+
+
+
 
         accountInfoButton.addActionListener(e -> {
             JDialog dialog = new JDialog(parentFrame, "Account info", Dialog.ModalityType.APPLICATION_MODAL);
