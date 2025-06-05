@@ -2,9 +2,16 @@ package org.example.UI;
 
 import org.example.Backend.ATM_online;
 import org.example.Backend.BankAccount;
+import java.net.InetAddress;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ATM_loginPanel extends JPanel {
     private JTextField usernameField  = new JTextField(15);
@@ -63,12 +70,45 @@ public class ATM_loginPanel extends JPanel {
         loginButton.addActionListener(e -> {
             BankAccount account = ATM_online.login(this);
             if (account != null) {
+
                 ATM_loggedPage loggedPage = new ATM_loggedPage(parentFrame, account);
                 parentFrame.setContentPane(loggedPage);
                 parentFrame.revalidate();
                 parentFrame.repaint();
+
+                JDialog loadingDialog = new JDialog(parentFrame, "Loading", false);
+                loadingDialog.setUndecorated(true);
+                JLabel loadingLabel = new JLabel("Please wait a moment, we are saving some info.", SwingConstants.CENTER);
+                loadingLabel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+                loadingDialog.add(loadingLabel);
+                loadingDialog.pack();
+                loadingDialog.setLocationRelativeTo(parentFrame);
+
+                SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                    @Override
+                    protected Void doInBackground() {
+                        try {
+                            saveLoginInfo();
+                        } catch (UnknownHostException ex) {
+                            SwingUtilities.invokeLater(() -> {
+                                errorLabel.setForeground(Color.RED);
+                                errorLabel.setText("Could not save login info: " + ex.getMessage());
+                            });
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        loadingDialog.dispose();
+                    }
+                };
+
+                worker.execute();
+                loadingDialog.setVisible(true);
             }
         });
+
 
         signupButton.addActionListener(e -> {
             ATM_createAccount createAccount = new ATM_createAccount(parentFrame);
@@ -77,6 +117,27 @@ public class ATM_loginPanel extends JPanel {
             parentFrame.repaint();
         });
     }
+
+    private void saveLoginInfo() throws UnknownHostException {
+        String ip = InetAddress.getLocalHost().getHostAddress();
+        String timestamp = LocalDateTime
+                .now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        try (BufferedWriter bufferedWriter = new BufferedWriter(
+                new FileWriter("ATM_login.txt", true))) {
+            bufferedWriter.append("Date: ")
+                    .append(timestamp)
+                    .append(", IP: ")
+                    .append(ip)
+                    .append("\n");
+            bufferedWriter.close();
+            System.out.println("scris cu succes");
+        } catch (IOException ioEx) {
+            errorLabel.setForeground(Color.RED);
+            errorLabel.setText("An error occurred while saving login info");
+        }
+    }
+
 
     public String getUsername() {
         return usernameField.getText().trim();
