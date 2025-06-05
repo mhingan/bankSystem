@@ -10,6 +10,7 @@ public class ATM_loggedPage extends JPanel {
     private JButton userInfoButton    = new JButton("MyInfo");
     private JButton accountInfoButton = new JButton("Account info");
     private JButton logoutButton      = new JButton("Logout");
+    private JButton historyButton      = new JButton("History");
 
     private BankAccount account;
 
@@ -123,7 +124,6 @@ public class ATM_loggedPage extends JPanel {
             dialog.add(saveButton);
 
             saveButton.addActionListener(ev -> {
-                // Validation: all fields must be non-empty
                 if (firstNameField.getText().trim().isEmpty()
                         || lastNameField.getText().trim().isEmpty()
                         || emailField.getText().trim().isEmpty()
@@ -134,7 +134,6 @@ public class ATM_loggedPage extends JPanel {
                     return;
                 }
 
-                // If validation passes, save and show success
                 u.setfName(firstNameField.getText());
                 u.setlName(lastNameField.getText());
                 u.setEmail(emailField.getText());
@@ -144,7 +143,6 @@ public class ATM_loggedPage extends JPanel {
                 errorLabel.setText("Saved successfully.");
                 errorLabel.setForeground(Color.GREEN);
 
-                // Delay closing so user sees the green message
                 new javax.swing.Timer(800, evt -> {
                     ((javax.swing.Timer) evt.getSource()).stop();
                     dialog.dispose();
@@ -172,5 +170,165 @@ public class ATM_loggedPage extends JPanel {
             dialog.setLocationRelativeTo(parentFrame);
             dialog.setVisible(true);
         });
+
+        JTextArea transactionArea = new JTextArea();
+
+        historyButton.setBounds(250, 180, 100, 30);
+        add(historyButton);
+
+
+        historyButton.addActionListener(e -> {
+            removeAll();
+            repaint();
+            setLayout(null);
+
+            JButton backButton = new JButton("Back");
+            backButton.setBounds(10, 10, 80, 30);
+            add(backButton);
+
+            JLabel loginLabel = new JLabel("Login History:");
+            loginLabel.setBounds(20, 50, 150, 20);
+            add(loginLabel);
+
+            JTextArea loginArea = new JTextArea();
+            loginArea.setEditable(false);
+
+            try {
+                java.util.List<String> loginLines = java.nio.file.Files.readAllLines(java.nio.file.Paths.get("ATM_login.txt"));
+                StringBuilder loginText = new StringBuilder();
+                for (String line : loginLines) {
+                    loginText.append(line).append("\n");
+                }
+                loginArea.setText(loginText.toString());
+            } catch (Exception ex) {
+                loginArea.setText("Could not load login history.");
+            }
+
+            JScrollPane loginScroll = new JScrollPane(loginArea);
+            loginScroll.setBounds(20, 70, 340, 100);
+            add(loginScroll);
+
+            JLabel transactionLabel = new JLabel("Transaction History:");
+            transactionLabel.setBounds(20, 180, 200, 20);
+            add(transactionLabel);
+
+
+            transactionArea.setEditable(false);
+
+            try {
+                java.util.List<String> transactionLines = java.nio.file.Files.readAllLines(java.nio.file.Paths.get("ATM_history_transactions.txt"));
+                StringBuilder transactionText = new StringBuilder();
+                for (String line : transactionLines) {
+                    transactionText.append(line).append("\n");
+                }
+                transactionArea.setText(transactionText.toString());
+            } catch (Exception ex) {
+                transactionArea.setText("Could not load transaction history.");
+            }
+
+            JScrollPane transactionScroll = new JScrollPane(transactionArea);
+            transactionScroll.setBounds(20, 200, 340, 100);
+            add(transactionScroll);
+
+            backButton.addActionListener(ev -> {
+                parentFrame.setContentPane(new ATM_loggedPage(parentFrame, account));
+                parentFrame.revalidate();
+                parentFrame.repaint();
+            });
+
+            revalidate();
+            repaint();
+        });
+
+
+
+        JPanel transferPanel = new JPanel();
+        transferPanel.setLayout(null);
+        transferPanel.setBorder(BorderFactory.createTitledBorder("New Transfer"));
+        transferPanel.setBounds(20, 310, 340, 130);
+        add(transferPanel);
+
+        JLabel toLabel = new JLabel("To:");
+        toLabel.setBounds(10, 20, 30, 20);
+        transferPanel.add(toLabel);
+
+        JTextField toField = new JTextField();
+        toField.setBounds(50, 20, 270, 20);
+        transferPanel.add(toField);
+
+        JLabel amountLabel = new JLabel("Amount:");
+        amountLabel.setBounds(10, 50, 60, 20);
+        transferPanel.add(amountLabel);
+
+        JTextField amountField = new JTextField();
+        amountField.setBounds(70, 50, 250, 20);
+        transferPanel.add(amountField);
+
+        JLabel statusLabel = new JLabel("");
+        statusLabel.setBounds(10, 105, 320, 20);
+        statusLabel.setForeground(Color.RED);
+        transferPanel.add(statusLabel);
+
+        JButton transferButton = new JButton("Transfer");
+        transferButton.setBounds(110, 80, 120, 20);
+        transferPanel.add(transferButton);
+
+        transferButton.addActionListener(ev -> {
+            String to = toField.getText().trim();
+            String amountText = amountField.getText().trim();
+
+            if (to.isEmpty() || amountText.isEmpty()) {
+                statusLabel.setText("Please fill in all fields.");
+                return;
+            }
+
+            double amount;
+            try {
+                amount = Double.parseDouble(amountText);
+            } catch (NumberFormatException ex) {
+                statusLabel.setText("Invalid amount.");
+                return;
+            }
+
+            if (amount <= 0) {
+                statusLabel.setText("Amount must be positive.");
+                return;
+            }
+
+            if (account.getBalance() < amount) {
+                statusLabel.setText("Insufficient balance.");
+                return;
+            }
+
+            account.setBalance(account.getBalance() - amount);
+            statusLabel.setForeground(Color.GREEN);
+            statusLabel.setText("Transfer successful.");
+
+            try {
+                java.nio.file.Files.write(
+                        java.nio.file.Paths.get("ATM_history_transactions.txt"),
+                        (u.getUsername() + " transferred " + amount + " RON to " + to + "\n").getBytes(),
+                        java.nio.file.StandardOpenOption.CREATE,
+                        java.nio.file.StandardOpenOption.APPEND
+                );
+            } catch (Exception ex) {
+                statusLabel.setForeground(Color.RED);
+                statusLabel.setText("Transfer saved, but failed to log.");
+            }
+
+            try {
+                java.util.List<String> transactionLines = java.nio.file.Files.readAllLines(java.nio.file.Paths.get("ATM_history_transactions.txt"));
+                StringBuilder transactionText = new StringBuilder();
+                for (String line : transactionLines) {
+                    transactionText.append(line).append("\n");
+                }
+                transactionArea.setText(transactionText.toString());
+            } catch (Exception ex) {
+                transactionArea.setText("Could not reload transaction history.");
+            }
+        });
+
+
+
     }
 }
