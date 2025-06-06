@@ -1,10 +1,17 @@
 package org.example.UI;
 
+import com.google.gson.Gson;
 import org.example.Backend.BankAccount;
+import org.example.Backend.GsonFactory;
 import org.example.Backend.User;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class ATM_loggedPage extends JPanel {
     private JButton userInfoButton    = new JButton("MyInfo");
@@ -12,7 +19,7 @@ public class ATM_loggedPage extends JPanel {
     private JButton logoutButton      = new JButton("Logout");
     private JButton historyButton      = new JButton("History");
 
-    private BankAccount account;
+    private static BankAccount account;
 
     public ATM_loggedPage(JFrame parentFrame, BankAccount account) {
         this.account = account;
@@ -303,6 +310,8 @@ public class ATM_loggedPage extends JPanel {
             account.setBalance(account.getBalance() - amount);
             statusLabel.setForeground(Color.GREEN);
             statusLabel.setText("Transfer successful.");
+            updateAccountBalance();
+
 
             try {
                 java.nio.file.Files.write(
@@ -330,5 +339,52 @@ public class ATM_loggedPage extends JPanel {
 
 
 
+
+
     }
+
+
+    private void updateAccountBalance() {
+        try {
+            Gson gson = GsonFactory.createGson();
+            String filePath = "atm_online_useri.json";
+            java.util.List<BankAccount> list;
+
+            if (Files.exists(Paths.get(filePath))) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+                    Type listType = new com.google.gson.reflect.TypeToken<java.util.List<BankAccount>>() {}.getType();
+                    list = gson.fromJson(reader, listType);
+                    if (list == null) {
+                        list = new ArrayList<>();
+                    }
+                }
+            } else {
+                list = new ArrayList<>();
+            }
+
+            for (BankAccount acc : list) {
+                if (acc.getNumber() == account.getNumber()) {
+                    acc.setBalance(account.getBalance());
+                    break;
+                }
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+                gson.toJson(list, writer);
+            }
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Error updating account:\n" + ex.getMessage(),
+                    "Update Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+
+
+
+
 }
